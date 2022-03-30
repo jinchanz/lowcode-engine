@@ -38,6 +38,13 @@ export default class NodeChildren {
   }
 
   /**
+   * judge if it is not empty
+   */
+  get notEmpty() {
+    return !this.isEmpty;
+  }
+
+  /**
    * 删除指定节点
    * @param node
    * @returns

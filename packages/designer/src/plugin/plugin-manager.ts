@@ -11,7 +11,9 @@ import {
   ILowCodePluginConfigMeta,
   PluginPreference,
   ILowCodePluginPreferenceDeclaration,
+  isLowCodeRegisterOptions,
 } from './plugin-types';
+import { filterValidOptions } from './plugin-utils';
 import { LowCodePlugin } from './plugin';
 import LowCodePluginContext from './plugin-context';
 import { invariant } from '../utils';
@@ -41,15 +43,31 @@ export class LowCodePluginManager implements ILowCodePluginManager {
     return semverSatisfies(engineVersion, versionExp);
   }
 
+  /**
+   * register a plugin
+   * @param pluginConfigCreator - a creator function which returns the plugin config
+   * @param options - the plugin options
+   * @param registerOptions - the plugin register options
+   */
   async register(
-    pluginConfigCreator: (ctx: ILowCodePluginContext) => ILowCodePluginConfig,
-    options?: ILowCodeRegisterOptions,
+    pluginConfigCreator: (ctx: ILowCodePluginContext, options: any) => ILowCodePluginConfig,
+    options?: any,
+    registerOptions?: ILowCodeRegisterOptions,
   ): Promise<void> {
-    const { pluginName, meta = {} } = pluginConfigCreator as any;
+    // registerOptions maybe in the second place
+    if (isLowCodeRegisterOptions(options)) {
+      registerOptions = options;
+      options = {};
+    }
+    let { pluginName, meta = {} } = pluginConfigCreator as any;
     const { preferenceDeclaration, engines } = meta as ILowCodePluginConfigMeta;
     const ctx = this._getLowCodePluginContext({ pluginName });
-    const config = pluginConfigCreator(ctx);
-
+    // compat the legacy way to declare pluginName
+    // TODO: invoke filterOptions!!!
+    // const config = pluginConfigCreator(ctx, options);
+    const config = pluginConfigCreator(ctx, filterValidOptions(options, preferenceDeclaration!));
+    // @ts-ignore
+    pluginName = pluginName || config.name;
     invariant(
       pluginName,
       'pluginConfigCreator.pluginName required',
@@ -83,6 +101,7 @@ export class LowCodePluginManager implements ILowCodePluginManager {
     }
 
     const plugin = new LowCodePlugin(pluginName, this, config, meta);
+    // support initialization of those plugins which registered after normal initialization by plugin-manager
     if (options?.autoInit) {
       await plugin.init();
     }

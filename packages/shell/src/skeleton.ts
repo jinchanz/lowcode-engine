@@ -13,6 +13,50 @@ export default class Skeleton {
     this[skeletonSymbol] = skeleton;
   }
 
+  // TODO: start
+
+  // get topArea() {
+  //   return this[skeletonSymbol].topArea;
+  // }
+
+  // get mainArea() {
+  //   return this[skeletonSymbol].mainArea;
+  // }
+
+  // get leftArea() {
+  //   return this[skeletonSymbol].leftArea;
+  // }
+
+  // get toolbar() {
+  //   return this[skeletonSymbol].toolbar;
+  // }
+
+  // get leftFixedArea() {
+  //   return this[skeletonSymbol].leftFixedArea;
+  // }
+
+  // get leftFloatArea() {
+  //   return this[skeletonSymbol].leftFloatArea;
+  // }
+
+  // get rightArea() {
+  //   return this[skeletonSymbol].rightArea;
+  // }
+
+  // get bottomArea() {
+  //   return this[skeletonSymbol].bottomArea;
+  // }
+
+  // get stages() {
+  //   return this[skeletonSymbol].stages;
+  // }
+
+  // getPanel(name: string) {
+  //   return this[skeletonSymbol].getPanel(name);
+  // }
+
+  // TODO: end
+
   /**
    * 增加一个面板实例
    * @param config

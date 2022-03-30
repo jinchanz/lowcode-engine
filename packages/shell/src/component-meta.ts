@@ -1,8 +1,10 @@
 import {
   ComponentMeta as InnerComponentMeta,
+  ParentalNode,
 } from '@alilc/lowcode-designer';
-import { componentMetaSymbol } from './symbols';
-
+import Node from './node';
+import { NodeData, NodeSchema } from '@alilc/lowcode-types';
+import { componentMetaSymbol, nodeSymbol } from './symbols';
 
 export default class ComponentMeta {
   private readonly [componentMetaSymbol]: InnerComponentMeta;
@@ -89,5 +91,27 @@ export default class ComponentMeta {
    */
   getMetadata() {
     return this[componentMetaSymbol].getMetadata();
+  }
+
+  /**
+   * check if the current node could be placed in parent node
+   * @param my
+   * @param parent
+   * @returns
+   */
+  checkNestingUp(my: Node | NodeData, parent: ParentalNode<NodeSchema>) {
+    const curNode = my.isNode ? my[nodeSymbol] : my;
+    return this[componentMetaSymbol].checkNestingUp(curNode as any, parent);
+  }
+
+  /**
+   * check if the target node(s) could be placed in current node
+   * @param my
+   * @param parent
+   * @returns
+   */
+   checkNestingDown(my: Node | NodeData, target: NodeSchema | Node | NodeSchema[]) {
+    const curNode = my.isNode ? my[nodeSymbol] : my;
+    return this[componentMetaSymbol].checkNestingDown(curNode as any, target[nodeSymbol] || target);
   }
 }

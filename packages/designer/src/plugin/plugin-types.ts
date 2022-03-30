@@ -130,6 +130,10 @@ export interface ILowCodePluginManagerCore {
 
 export type ILowCodePluginManager = ILowCodePluginManagerCore & ILowCodePluginManagerPluginAccessor;
 
+export function isLowCodeRegisterOptions(opts: any): opts is ILowCodeRegisterOptions {
+  return opts && 'autoInit' in opts;
+}
+
 export interface ILowCodeRegisterOptions {
   autoInit?: boolean;
   // allow overriding existing plugin with same name when override === true
