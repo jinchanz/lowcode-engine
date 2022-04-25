@@ -31,13 +31,30 @@ export default class DragGhost extends Component<{ designer: Designer }> {
         }
         this.dragObject = e.dragObject;
         this.domNode = this.dragObject?.nodes?.[0]?.getDOMNode();
-        this.ghostNode = this.domNode?.cloneNode?.();
-        this.x = e.globalX;
-        this.y = e.globalY;
+        if (!this.domNode) return;
+        const domRect: DOMRect = this.domNode.getBoundingClientRect();
+        this.deltaX = e.canvasX - domRect.left;
+        this.deltaY = e.canvasY - domRect.top;
+        this.width = domRect.width;
+        this.height = domRect.height;
       }),
       this.dragon.onDrag(e => {
-        this.x = e.globalX;
-        this.y = e.globalY;
+        this.x = e.globalX - this.deltaX;
+        this.y = e.globalY - this.deltaY;
+        if (!this.domNode) return;
+        const domRect: DOMRect = this.domNode.getBoundingClientRect();
+        const closeX = this.domNode.dataset.closeX;
+        if (+closeX) {
+          this.x = this.x - (+closeX);
+          this.width = 0;
+          this.height = this.y + domRect.height - (e.globalY - e.canvasY);
+          this.y = e.globalY - e.canvasY;
+        } else {
+          this.width = domRect.width;
+          this.height = domRect.height;
+          this.x = e.globalX - this.deltaX;
+          this.y = e.globalY - this.deltaY;
+        }
         if (isSimulatorHost(e.sensor)) {
           const container = e.sensor.getDropContainer(e);
           if (container?.container.componentMeta.getMetadata().configure.advanced?.isAbsoluteLayoutContainer) {
@@ -51,6 +68,8 @@ export default class DragGhost extends Component<{ designer: Designer }> {
         this.dragObject = null;
         this.x = 0;
         this.y = 0;
+        this.height = 0;
+        this.width = 0;
       }),
     ];
   }
@@ -97,7 +116,6 @@ export default class DragGhost extends Component<{ designer: Designer }> {
     if (this.isAbsoluteLayoutContainer) {
       return null;
     }
-
     return (
       <div
         style={{
@@ -105,17 +123,11 @@ export default class DragGhost extends Component<{ designer: Designer }> {
           zIndex: 99999,
           left: this.x,
           top: this.y,
+          width: this.width,
+          height: this.height,
+          border: '1px solid red',
         }}
-        ref={(ghost) => {
-          if (ghost && this.ghostNode) {
-            ghost.innerHtml = '';
-            ghost.appendChild(this.ghostNode);
-          }
-        }}
-      >
-        {/* {this.domNode ? this.domNode : null} */}
-        {/* {this.renderGhostGroup()} */}
-      </div>
+      />
     );
   }
 }
