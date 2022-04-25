@@ -30,6 +30,8 @@ export default class DragGhost extends Component<{ designer: Designer }> {
           return;
         }
         this.dragObject = e.dragObject;
+        this.domNode = this.dragObject?.nodes?.[0]?.getDOMNode();
+        this.ghostNode = this.domNode?.cloneNode?.();
         this.x = e.globalX;
         this.y = e.globalY;
       }),
@@ -98,13 +100,21 @@ export default class DragGhost extends Component<{ designer: Designer }> {
 
     return (
       <div
-        className="lc-ghost-group"
         style={{
+          position: 'fixed',
+          zIndex: 99999,
           left: this.x,
           top: this.y,
         }}
+        ref={(ghost) => {
+          if (ghost && this.ghostNode) {
+            ghost.innerHtml = '';
+            ghost.appendChild(this.ghostNode);
+          }
+        }}
       >
-        {this.renderGhostGroup()}
+        {/* {this.domNode ? this.domNode : null} */}
+        {/* {this.renderGhostGroup()} */}
       </div>
     );
   }

@@ -120,6 +120,26 @@ export default class DesignerPlugin extends PureComponent<PluginProps, DesignerP
         className="lowcode-plugin-designer"
         editor={editor}
         designer={editor.get('designer')}
+        onDrag={(e) => {
+          const { dragObject } = e;
+          const node = dragObject?.nodes?.[0];
+          if (!node) return;
+          const domNode = node.getDOMNode();
+          domNode.style.position = 'fixed';
+          domNode.style.left = `${e.canvasX}px`;
+          domNode.style.top = `${e.canvasY}px`;
+          domNode.style.transition = 'none';
+        }}
+        onDragend={(e, loc) => {
+          const { dragObject } = e;
+          const node = dragObject?.nodes?.[0];
+          if (!node) return;
+          node.setPropValue('style', {
+            position: 'fixed',
+            left: loc?.event.canvasX,
+            top: loc?.event.canvasY,
+          });
+        }}
         componentMetadatas={componentMetadatas}
         simulatorProps={{
           library,
